@@ -17,13 +17,13 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-    parallel:
+    strategy:
       matrix:
         python-version: [3.9]
         day: [1, 2, 3]
 
     steps:
-    - name: |
+    - run: |
         echo "Testing Day ${day} Tutorials on ${python-version}"
     - uses: actions/checkout@v2
     - uses: conda-incubator/setup-miniconda@v3
@@ -33,7 +33,7 @@ jobs:
     - name: Test notebooks execution
       run: |
         conda activate igwn-py39-lw
-        for file in Tutorials/Day_${day}/*ipynb; do
+        for file in Tutorials/Day_"${day}"/*ipynb; do
             echo "Checking ${file}";
             if ! ./tests/check_run.sh "${file}"; then
                 echo "::error file=${file},title=Error";
