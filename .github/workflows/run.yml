@@ -10,18 +10,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  run:
-    name: Run the notebooks
+  check_run:
+    name: Check that tutorials run
 
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
-    strategy:
+    parallel:
       matrix:
         python-version: [3.9]
+        day: [1, 2, 3]
 
     steps:
+    - name: |
+        echo "Testing Day ${day} Tutorials on ${python-version}"
     - uses: actions/checkout@v2
     - uses: conda-incubator/setup-miniconda@v3
     - name: Installing requirements
@@ -29,8 +32,8 @@ jobs:
         conda env create -f environment.yml
     - name: Test notebooks execution
       run: |
-        conda activate introduction_gwosc_data
-        for file in *.ipynb; do
+        conda activate igwn-py39-lw
+        for file in Tutorials/Day_${day}/*ipynb; do
             echo "Checking ${file}";
             if ! ./tests/check_run.sh "${file}"; then
                 echo "::error file=${file},title=Error";
