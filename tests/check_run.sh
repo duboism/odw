@@ -3,7 +3,6 @@
 # This script checks that a notebook execute properly.
 # To do so, we export it to python and execute the script.
 # The script is always executed in WORKING_DIR (see below).
-# TODO: should we recode this in python (with the nbconvert API)?
 
 set -e
 set -u
@@ -13,11 +12,6 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 ROOT_DIR=$(dirname "${SCRIPT_DIR}")
 WORKING_DIR="${ROOT_DIR}/tmp/"
-
-# This file is needed by some notebooks so the best option is to download it if needed
-# We include the checksum to avoid incorrect downloads
-DATA_FILE=H-H1_GWOSC_O3b_4KHZ_R1-1264312320-4096.hdf5
-SHA512=51d21d438677e6750879824a12088dbff28fa7824cd10ee4fe42bedf24a9596cb53ed26c5416c386ba76cf0d8d2c24cf471505deaae8599c633afab2cfe81282
 
 function print_usage()
 {
@@ -63,13 +57,6 @@ fi
 
 # Now change directory
 cd "${WORKING_DIR}"
-
-# Download DATA_FILE
-while [[ ! -f "${DATA_FILE}" && $(sha512sum "${DATA_FILE}" | awk '{print $1}') != "${SHA512}" ]]
-do
-    echo "Downloading data file"
-    curl -L "http://gwosc.org/archive/data/O3b_4KHZ_R1/1263534080/${DATA_FILE}" -o "${DATA_FILE}"
-done
 
 # Convert the file to python and execute it
 # Record potential problems to report them
